@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from models.database import database
-from models.models import Student, Committee
+from models.models import User
 from fastapi import APIRouter, Depends, status
 from typing import Dict
 from fastapi.responses import JSONResponse
@@ -25,26 +25,14 @@ async def register(data : Dict):
     #salt = bcrypt.gensalt()
     #hash_password = bcrypt.hashpw(password.encode("utf-8"), salt)
 
-    if usertype == "student":
-        already = database.query(Student).filter(Student.email == email).first()
-        if already:
-            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": "Student already exists"})
-        else:
-            student = Student(first_name=fname, last_name=lname, email=email, password=password)
-            database.add(student)
-            database.commit()
-            return JSONResponse(status_code=status.HTTP_201_CREATED, content={"message": "Student registered successfully"})
-    elif usertype == "committee":
-        already = database.query(Committee).filter(Committee.email == email).first()
-        if already:
-            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": "Committee already exists"})
-        else:
-            committee = Committee(first_name=fname, last_name=lname, email=email, password=password)
-            database.add(committee)
-            database.commit()
-            return JSONResponse(status_code=status.HTTP_201_CREATED, content={"message": "Committee registered successfully"})
+    already = database.query(User).filter(User.email == email).first()
+    if already:
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": "Student already exists"})
     else:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": "Invalid usertype"})
+        user = User(first_name=fname, last_name=lname, email=email, password=password, role=usertype)
+        database.add(user)
+        database.commit()
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content={"message": "Student registered successfully"})
 
 class UserLoginRequest(BaseModel):
     """Request model for the login endpoint"""
@@ -53,23 +41,18 @@ class UserLoginRequest(BaseModel):
     password: str
 
 @manager.user_loader()
-def query_user(email_id, usertype):
+def query_user(email_id):
     try:
-        if usertype == "student":
-            return database.query(Student).filter_by(email=email_id).one()
-        elif usertype == "committee":
-            return database.query(Committee).filter_by(email=email_id).one()
+        return database.query(User).filter_by(email=email_id).one()
     except NoResultFound:
         raise NoResultFound("User not found")
 
 @router.post("/login")
-async def login(usertype: str, data: OAuth2PasswordRequestForm = Depends()):
-    print(data)
-    usertype = usertype.lower()
+async def login(data: OAuth2PasswordRequestForm = Depends()):
     email = data.username.lower()
     password = data.password
     try:
-        user = query_user(email, usertype)
+        user = query_user(email)
     except NoResultFound:
         print("User not found")
         raise InvalidCredentialsException
@@ -94,3 +77,17 @@ async def data(user=Depends(manager)):
         status_code=status.HTTP_200_OK,
         content="You are logged in as " + user.email
     )
+
+
+@router.get("/protected")
+async def protected_route(user=Depends(manager)):
+    if user:
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content="You are logged in as " + user.email
+        )
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content="You are not logged in"
+        )
