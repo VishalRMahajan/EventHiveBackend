@@ -1,0 +1,9 @@
+sqlalchemy
+python-dotenv
+cloud-sql-python-connector[pg8000]
+fastapi
+psycopg2-binary
+uvicorn
+bcrypt
+fastapi-login
+python-multipart
