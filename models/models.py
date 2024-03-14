@@ -17,6 +17,15 @@ class Event(Base):
 
     event_id = Column(Integer, primary_key=True, nullable=False)
     event_name = Column(String, index=True, nullable=False)
+    committee = Column(String, index=True, nullable=False)
+    contact_person = Column(String, index=True, nullable=False)
+    description = Column(String, index=True, nullable=False)
+    date = Column(String, index=True, nullable=False)
+    time = Column(String, index=True, nullable=False)
+    ticket_price = Column(Integer, index=True, nullable=False)
+    venue = Column(String, index=True, nullable=False)
+    contact_number = Column(Integer, index=True, nullable=False)
+
 
 
 Base.metadata.create_all(bind=engine)

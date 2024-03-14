@@ -71,20 +71,14 @@ async def login(data: OAuth2PasswordRequestForm = Depends()):
         )
 
 
-@router.post("/verify")
-async def data(user=Depends(manager)):
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content="You are logged in as " + user.email
-    )
-
-
 @router.get("/protected")
 async def protected_route(user=Depends(manager)):
     if user:
         return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content="You are logged in as " + user.email
+            content={
+                "Role": user.role
+            },
         )
     else:
         return JSONResponse(
