@@ -38,8 +38,23 @@ async def root():
     return {"message": "Hello World"}
 
 
+@app.get("/pay", response_class=HTMLResponse)
+async def payment_by_email(request: Request, amount: int, email: str):
+    """Endpoint to make payments"""
+    data = {
+        "amount": amount * 100,
+        "currency": "INR",
+        "receipt": token_hex(3),
+        "notes": {"user_id": email}
+    }
+    order = client.order.create(data=data)
+    return templates.TemplateResponse(
+        "pay.html", {"request": request, "order": order}
+    )
+
+
 @app.get("/pay/{amount}", response_class=HTMLResponse, dependencies=[Depends(manager)])
-async def payment(request: Request, amount: int, user=Depends(manager)):
+async def payment_by_user(request: Request, amount: int, user=Depends(manager)):
     """Endpoint to make payments"""
     data = {
         "amount": amount * 100,
