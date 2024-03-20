@@ -48,3 +48,22 @@ async def get_all_events():
             "contact_number": event.contact_number
         })
     return all_events
+
+#to fect fest
+@router.get("/fetch")
+async def fetch_event(event_name: str):
+    event = database.query(Event).filter(Event.event_name == event_name).first()
+    if event:
+        return {
+            "event_name": event.event_name,
+            "committee": event.committee,
+            "contact_person": event.contact_person,
+            "description": event.description,
+            "date": event.date,
+            "time": event.time,
+            "ticket_price": event.ticket_price,
+            "venue": event.venue,
+            "contact_number": event.contact_number
+        }
+    else:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": "Event not found"})
