@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Razorpay Integration</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <script>
+        var options = {
+            "key": "{{ order.key }}",
+            "amount": "{{ order.amount }}",
+            "currency": "{{ order.currency }}",
+            "order_id": "{{ order.id }}",
+            "name": "Test Company",
+            "description": "Payment for Order #{{ order.id }}",
+            "image": "https://cscita.sfit.ac.in/images/engg.png",
+            "handler": function (response){
+                alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+            },
+            "redirect": true,
+            "callback_url": "www.google.com",
+            "modal": {
+                "backdrop_close": true,
+                "confirm_close": true,
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response){
+            alert("Payment Failed! Error: " + response.error.description);
+        });
+        rzp1.open();
+    </script>
+</body>
+</html>
