@@ -1,17 +1,8 @@
-from fastapi import APIRouter, Depends, status
-from fastapi.responses import JSONResponse
-from datetime import datetime, timedelta
 from models.database import database
-from models.models import User
 from fastapi import APIRouter, Depends, status
 from typing import Dict
 from fastapi.responses import JSONResponse
-import bcrypt
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi_login import LoginManager
-from fastapi_login.exceptions import InvalidCredentialsException
-from pydantic import BaseModel
-from sqlalchemy.exc import NoResultFound
+
 
 router = APIRouter(prefix="/profile")
 from routes.auth import manager

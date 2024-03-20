@@ -15,16 +15,15 @@ class User(Base):
 class Event(Base):
     __tablename__ = "events"
 
-    event_id = Column(Integer, primary_key=True, nullable=False)
-    event_name = Column(String, index=True, nullable=False)
+    event_name = Column(String, index=True, nullable=False,primary_key=True)
     committee = Column(String, index=True, nullable=False)
     contact_person = Column(String, index=True, nullable=False)
     description = Column(String, index=True, nullable=False)
     date = Column(String, index=True, nullable=False)
     time = Column(String, index=True, nullable=False)
-    ticket_price = Column(Integer, index=True, nullable=False)
+    ticket_price = Column(String, index=True, nullable=False)
     venue = Column(String, index=True, nullable=False)
-    contact_number = Column(Integer, index=True, nullable=False)
+    contact_number = Column(String, index=True, nullable=False)
 
 
 

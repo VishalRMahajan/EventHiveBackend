@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.auth import router as auth_router
 from routes.profile import router as profile_router
+from routes.fest import router as fest_router
 
 app = FastAPI()
 
@@ -22,3 +23,4 @@ async def root():
 
 app.include_router(router=auth_router)
 app.include_router(router=profile_router)
+app.include_router(router=fest_router)
