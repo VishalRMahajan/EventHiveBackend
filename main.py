@@ -2,7 +2,7 @@ import razorpay
 from os import getenv
 from dotenv import load_dotenv
 from secrets import token_hex
-from fastapi import FastAPI, Depends, Request, status
+from fastapi import FastAPI, Depends, Request, status,HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,6 +13,10 @@ from routes.auth import manager
 from models.models import UserEvent,User
 from models.database import database
 from cloudinary_setup import generate_url
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
+import requests
 
 load_dotenv()
 
@@ -94,6 +98,7 @@ async def addeventdb(data: dict):
     qr_url = generate_url(url_to_generate)
     user_event = UserEvent(email=email, event_name=event_name, committee=committee, qr_url=qr_url)
     database.add(user_event)
+    send_email(event_name, qr_url, email)
     try:
         database.commit()
         return {"message": "Event added successfully"}
@@ -150,6 +155,62 @@ async def bookedticketdata(committee : str):
             event.event_name,
         ])
     return all_tickets
+
+
+def send_email(event_name: str, qr_code_url: str, email: str):
+    sender_email = "EventHiveSfit@gmail.com"
+    receiver_email = email
+    password = getenv("APP_PASSWORD")
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    message["Subject"] = "Registration Confirmation"
+
+    html = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Email Template</title>
+    </head>
+    <body style="font-family: Arial, sans-serif;">
+
+        <table cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td style="background-color: #f5f5f5; padding: 20px; text-align: center;">
+                    <h1 style="color: #333;">EventHive</h1>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 20px;">
+                    <p>Hello,</p>
+                    <p>You have successfully registered for {event_name}</p>
+                    <img src="{qr_code_url}" alt="QR Code">
+                    <p>Regards,<br>EventHive</p>
+                </td>
+            </tr>
+        </table>
+
+    </body>
+    </html>
+    """
+
+    message.attach(MIMEText(html, "html"))
+
+    try:
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+            print("Email sent successfully")
+        return {"message": "Email sent successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 app.include_router(router=auth_router)
