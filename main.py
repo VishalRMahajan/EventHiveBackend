@@ -12,6 +12,7 @@ from routes.fest import router as fest_router
 from routes.auth import manager
 from models.models import UserEvent
 from models.database import database
+from cloudinary_setup import generate_url
 
 load_dotenv()
 
@@ -88,7 +89,10 @@ async def addeventdb(data: dict):
     email = data.get("email")
     event_name = data.get("event_name")
     committee = data.get("committee")
-    user_event = UserEvent(email=email, event_name=event_name, committee=committee)
+
+    url_to_generate = f"http://localhost:3000/verify_ticket/{event_name}+{email}+{committee}"
+    qr_url = generate_url(url_to_generate)
+    user_event = UserEvent(email=email, event_name=event_name, committee=committee, qr_url=qr_url)
     database.add(user_event)
     try:
         database.commit()
@@ -105,6 +109,33 @@ async def checkifregistered(email: str , event_name : str, committee : str):
         return JSONResponse(status_code=status.HTTP_200_OK, content={"message": f"You are registered for event {event_name}"})
     else:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": "You are not registered for this event"})
+
+@app.post("/verify_ticket")
+async def verify_ticket(event_name: str, email: str, committee: str):
+    print(event_name, email, committee)
+    #user_event = database.query(UserEvent).filter(UserEvent.email == email, UserEvent.event_name == event_name, UserEvent.committee == committee).first()
+    user_event = database.query(
+        database.query(UserEvent).filter(UserEvent.email == email, UserEvent.event_name == event_name,
+                                         UserEvent.committee == committee).exists()).scalar()
+    print(user_event)
+    if user_event:
+        return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Ticket verified"})
+    else:
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": "Ticket not verified"})
+
+@app.post("/mytickets")
+async def mytickets(user=Depends(manager)):
+    email = user.email
+    print(email)
+    user_events = database.query(UserEvent).filter(UserEvent.email == email).all()
+    all_tickets = []
+    for event in user_events:
+        all_tickets.append({
+            "event_name": event.event_name,
+            "committee": event.committee,
+            "qr_url": event.qr_url
+        })
+    return all_tickets
 
 app.include_router(router=auth_router)
 app.include_router(router=profile_router)
