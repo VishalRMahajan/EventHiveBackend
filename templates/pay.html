@@ -30,7 +30,8 @@
                             },
                             body: JSON.stringify({
                                 email: '{{ email }}',
-                                event_name: '{{ event_name }}'
+                                event_name: '{{ event_name }}',
+                                committee: '{{ committee }}'
                             })
                         }).then(function(response) {
                             if(response.ok) {

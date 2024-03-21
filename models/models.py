@@ -31,6 +31,7 @@ class UserEvent(Base):
 
     email = Column(String, index=True, nullable=False, primary_key=True)
     event_name = Column(String, index=True, nullable=False, primary_key=True)
+    committee = Column(String, index=True, nullable=False)
 
 
 

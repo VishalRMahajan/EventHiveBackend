@@ -41,7 +41,7 @@ async def root():
 
 
 @app.get("/pay", response_class=HTMLResponse)
-async def payment_by_email(request: Request, amount: int, email: str, event_name: str):
+async def payment_by_email(request: Request, amount: int, email: str, event_name: str,committee :str):
     """Endpoint to make payments"""
     print(event_name)
     data = {
@@ -53,7 +53,7 @@ async def payment_by_email(request: Request, amount: int, email: str, event_name
     print(data)
     order = client.order.create(data=data)
     return templates.TemplateResponse(
-        "pay.html", {"request": request, "order": order, "email": email, "event_name": event_name}
+        "pay.html", {"request": request, "order": order, "email": email, "event_name": event_name, "committee": committee}
     )
 
 
@@ -87,7 +87,8 @@ async def addeventdb(data: dict):
     print(data)
     email = data.get("email")
     event_name = data.get("event_name")
-    user_event = UserEvent(email=email, event_name=event_name)
+    committee = data.get("committee")
+    user_event = UserEvent(email=email, event_name=event_name, committee=committee)
     database.add(user_event)
     try:
         database.commit()
