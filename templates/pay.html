@@ -16,13 +16,27 @@
             "description": "Payment for Order #{{ order.id }}",
             "image": "https://cscita.sfit.ac.in/images/engg.png",
             "handler": function (response){
-                alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+                fetch(`/verify_payment?payment_id=${response.razorpay_payment_id}&order_id={{ order.id }}&payment_sign=${response.razorpay_signature}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }).then(function(response) {
+                    if(response.ok) {
+                        window.location.href = "http://localhost:3000/success";
+                    } else {
+                        throw new Error('Payment verification failed');
+                    }
+                }).catch(function(error) {
+                    console.log('There has been a problem with your fetch operation: ' + error.message);
+                });
             },
-            "redirect": true,
             "modal": {
                 "backdrop_close": true,
                 "confirm_close": true,
-            }
+            },
+            // callback_url: "http://localhost:3000/success?order_id={{ order.id }}&payment_id={{ payment_id }}",
+            // redirect: true,
         };
 
         var rzp1 = new Razorpay(options);

@@ -66,7 +66,18 @@ async def payment_by_user(request: Request, amount: int, user=Depends(manager)):
     return templates.TemplateResponse(
         "pay.html", {"request": request, "order": order}
     )
-
+@app.get("/verify_payment")
+async def verify_payment(order_id: str,payment_id: str, payment_sign: str):
+    """Endpoint to verify payments"""
+    print("inside verify_payment")
+    print(order_id, payment_id, payment_sign)
+    try:
+        payment = client.payment.fetch(payment_id)
+        client.utility.verify_payment_signature(payment)
+        print("Payment successful")
+        return {"message": "Payment successful"}
+    except Exception as e:
+        return {"message": "Payment failed"}
 
 app.include_router(router=auth_router)
 app.include_router(router=profile_router)
