@@ -24,7 +24,18 @@ class Event(Base):
     ticket_price = Column(String, index=True, nullable=False)
     venue = Column(String, index=True, nullable=False)
     contact_number = Column(String, index=True, nullable=False)
-def after_insert_listener(mapper, connection, target):
+
+
+class UserEvent(Base):
+    __tablename__ = "user_event"
+
+    email = Column(String, index=True, nullable=False, primary_key=True)
+    event_name = Column(String, index=True, nullable=False, primary_key=True)
+
+
+
+
+"""def after_insert_listener(mapper, connection, target):
     meta = MetaData()
     table = Table(
         target.event_name, meta,
@@ -34,7 +45,17 @@ def after_insert_listener(mapper, connection, target):
     )
     meta.create_all(engine)
 
-event.listen(Event, 'after_insert', after_insert_listener)
+def create_user_email_table(mapper, connection, target):
+    meta = MetaData()
+    table = Table(
+        target.email, meta,
+        Column('event_name', String(50)),
+        Column('committee', String(50)),
+    )
+    meta.create_all(engine)
+
+event.listen(User, 'after_insert', create_user_email_table)
+event.listen(Event, 'after_insert', after_insert_listener)"""
 
 
 Base.metadata.create_all(bind=engine)

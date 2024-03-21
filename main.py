@@ -39,14 +39,16 @@ async def root():
 
 
 @app.get("/pay", response_class=HTMLResponse)
-async def payment_by_email(request: Request, amount: int, email: str):
+async def payment_by_email(request: Request, amount: int, email: str, event_name: str):
     """Endpoint to make payments"""
+    print(event_name)
     data = {
         "amount": amount * 100,
         "currency": "INR",
         "receipt": token_hex(3),
-        "notes": {"user_id": email}
+        "notes": {"user_id": email, "event_name": event_name}
     }
+    print(data)
     order = client.order.create(data=data)
     return templates.TemplateResponse(
         "pay.html", {"request": request, "order": order}
