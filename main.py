@@ -10,7 +10,7 @@ from routes.auth import router as auth_router
 from routes.profile import router as profile_router
 from routes.fest import router as fest_router
 from routes.auth import manager
-from models.models import UserEvent
+from models.models import UserEvent,User
 from models.database import database
 from cloudinary_setup import generate_url
 
@@ -136,6 +136,21 @@ async def mytickets(user=Depends(manager)):
             "qr_url": event.qr_url
         })
     return all_tickets
+
+@app.post("/bookedticketdata")
+async def bookedticketdata(committee : str):
+    user_events = database.query(UserEvent).filter(UserEvent.committee == committee).all()
+    all_tickets = []
+    for event in user_events:
+        user_details = database.query(User).filter(User.email == event.email).first()
+        all_tickets.append([
+            user_details.first_name,
+            user_details.last_name,
+            event.email,
+            event.event_name,
+        ])
+    return all_tickets
+
 
 app.include_router(router=auth_router)
 app.include_router(router=profile_router)
