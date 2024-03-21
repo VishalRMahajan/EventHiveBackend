@@ -2,8 +2,8 @@ import razorpay
 from os import getenv
 from dotenv import load_dotenv
 from secrets import token_hex
-from fastapi import FastAPI, Depends, Request
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Depends, Request, status
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from routes.auth import router as auth_router
@@ -97,6 +97,18 @@ async def addeventdb(data: dict):
         database.rollback()
         return {"message": "Event already exists"}
 
+@app.post("/checkifregistered")
+async def checkifregistered(email: str , event_name : str, committee : str):
+    user_event_exists = database.query(database.query(UserEvent).filter(UserEvent.email == email, UserEvent.event_name == event_name,UserEvent.committee == committee).exists()).scalar()
+    print("User Event is", user_event_exists)
+    if user_event_exists:
+        return JSONResponse(status_code=status.HTTP_200_OK, content={"message": f"You are registered for event {event_name}"})
+    else:
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": "You are not registered for this event"})
+
 app.include_router(router=auth_router)
 app.include_router(router=profile_router)
 app.include_router(router=fest_router)
+
+
+
