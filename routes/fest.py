@@ -67,3 +67,14 @@ async def fetch_event(event_name: str):
         }
     else:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": "Event not found"})
+
+#get ticket_price using event_name
+@router.get("/ticket_price")
+async def get_ticket_price(event_name: str):
+    event = database.query(Event).filter(Event.event_name == event_name).first()
+    if event:
+        return {
+            "ticket_price": event.ticket_price
+        }
+    else:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": "Event not found"})

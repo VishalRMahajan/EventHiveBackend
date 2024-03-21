@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String,event, Table, MetaData
 from .database import Base, engine
 
 
@@ -24,7 +24,17 @@ class Event(Base):
     ticket_price = Column(String, index=True, nullable=False)
     venue = Column(String, index=True, nullable=False)
     contact_number = Column(String, index=True, nullable=False)
+def after_insert_listener(mapper, connection, target):
+    meta = MetaData()
+    table = Table(
+        target.event_name, meta,
+        Column('first_name', String(50)),
+        Column('last_name', String(50)),
+        Column('email', String(50)),
+    )
+    meta.create_all(engine)
 
+event.listen(Event, 'after_insert', after_insert_listener)
 
 
 Base.metadata.create_all(bind=engine)

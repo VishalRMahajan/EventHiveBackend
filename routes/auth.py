@@ -77,7 +77,8 @@ async def protected_route(user=Depends(manager)):
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content={
-                "Role": user.role
+                "Role": user.role,
+                "email": user.email,
             },
         )
     else:
