@@ -23,7 +23,24 @@
                     }
                 }).then(function(response) {
                     if(response.ok) {
-                        window.location.href = "http://localhost:3000/success";
+                        fetch('/addeventdb', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                email: '{{ email }}',
+                                event_name: '{{ event_name }}'
+                            })
+                        }).then(function(response) {
+                            if(response.ok) {
+                                window.location.href = "http://localhost:3000/dashboard";
+                            } else {
+                                throw new Error('Adding event to database failed');
+                            }
+                        }).catch(function(error) {
+                            console.log('There has been a problem with your fetch operation: ' + error.message);
+                        });
                     } else {
                         throw new Error('Payment verification failed');
                     }

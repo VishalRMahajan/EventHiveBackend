@@ -10,6 +10,8 @@ from routes.auth import router as auth_router
 from routes.profile import router as profile_router
 from routes.fest import router as fest_router
 from routes.auth import manager
+from models.models import UserEvent
+from models.database import database
 
 load_dotenv()
 
@@ -51,7 +53,7 @@ async def payment_by_email(request: Request, amount: int, email: str, event_name
     print(data)
     order = client.order.create(data=data)
     return templates.TemplateResponse(
-        "pay.html", {"request": request, "order": order}
+        "pay.html", {"request": request, "order": order, "email": email, "event_name": event_name}
     )
 
 
@@ -79,6 +81,20 @@ async def verify_payment(order_id: str,payment_id: str, payment_sign: str):
         return {"message": "Payment successful"}
     except Exception as e:
         return {"message": "Payment failed"}
+
+@app.post("/addeventdb")
+async def addeventdb(data: dict):
+    print(data)
+    email = data.get("email")
+    event_name = data.get("event_name")
+    user_event = UserEvent(email=email, event_name=event_name)
+    database.add(user_event)
+    try:
+        database.commit()
+        return {"message": "Event added successfully"}
+    except:
+        database.rollback()
+        return {"message": "Event already exists"}
 
 app.include_router(router=auth_router)
 app.include_router(router=profile_router)
