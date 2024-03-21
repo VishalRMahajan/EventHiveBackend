@@ -74,7 +74,6 @@ async def verify_payment(order_id: str,payment_id: str, payment_sign: str):
     try:
         payment = client.payment.fetch(payment_id)
         client.utility.verify_payment_signature(payment)
-        print("Payment successful")
         return {"message": "Payment successful"}
     except Exception as e:
         return {"message": "Payment failed"}
