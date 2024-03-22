@@ -4,7 +4,7 @@ from sqlalchemy.orm import declarative_base, Session
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 load_dotenv()
-DB_URL = "postgresql://vishal:993uhp!_-b9dQjD@35.200.156.179:5432/eventhive-db"
+DB_URL = getenv("DBURL")
 
 engine = create_engine(DB_URL)
 
