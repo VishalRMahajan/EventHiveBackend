@@ -1,14 +1,9 @@
-from os import getenv
-from dotenv import load_dotenv
-load_dotenv()
+import io
 import cloudinary
 import cloudinary.uploader
 import qrcode
-from PIL import Image
-import io
 
 config = cloudinary.config(secure=True)
-
 
 
 def generate_url(url : str):
