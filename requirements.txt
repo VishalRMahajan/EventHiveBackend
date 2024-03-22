@@ -8,3 +8,8 @@ bcrypt
 fastapi-login
 python-multipart
 razorpay
+gunicorn
+cloudinary
+pillow
+qrcode
+jinja2

@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, status
 from typing import Dict
 from fastapi.responses import JSONResponse
 import bcrypt
+from os import getenv
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_login import LoginManager
 from fastapi_login.exceptions import InvalidCredentialsException
