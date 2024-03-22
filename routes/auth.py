@@ -10,8 +10,10 @@ from fastapi_login import LoginManager
 from fastapi_login.exceptions import InvalidCredentialsException
 from pydantic import BaseModel
 from sqlalchemy.exc import NoResultFound
+from dotenv import load_dotenv
+load_dotenv()
 
-SECRET = "36d25b15c99e0684166cdfc27e1b9f724a223c6fa810230d"
+SECRET = getenv("SECRET")
 router = APIRouter(prefix="/auth")
 manager = LoginManager(SECRET, "/auth/login")
 
