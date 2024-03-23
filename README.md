@@ -63,6 +63,22 @@ Run the following command to run the backend server:
 ## Disclaimer
 
 **Important:** Do not use ports 3000 or 8000  to run the FastAPI backend, as Reflex is already using these ports. Using these ports for FastAPI may result in conflicts and errors.
+
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`DB_URL` = URL OF YOUR DATABASE
+
+`SECRECT` = SECRET KEY FOR JWT TOKEN
+
+`RZP_KEY` = RAZORPAY KEY
+
+`RZP_SECRET` = RAZORPAY SECRECT
+
+`APP_PASSWORD` = APP PASSWORD OF GMAIL ACCOUNT
+
+
 ## Docs
 
 For any queries, Refer following Docs:
